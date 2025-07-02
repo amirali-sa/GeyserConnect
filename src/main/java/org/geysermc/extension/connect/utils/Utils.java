@@ -77,7 +77,16 @@ public class Utils {
     }
 
     public static String displayName(Connection session) {
-        return session.bedrockUsername() + " (" + session.xuid() + ")";
+        if (GeyserConnect.instance().config().bedrockAuthMode().equalsIgnoreCase("offline")) {
+            return session.bedrockUsername();
+        }
+        // For online mode, or if bedrockAuthMode is not set (defaulting to online behavior from Config.java)
+        String xuid = session.xuid();
+        if (xuid == null || xuid.isEmpty()) {
+            // Fallback if xuid is somehow not available even in online mode, though Geyser usually provides it.
+            return session.bedrockUsername();
+        }
+        return session.bedrockUsername() + " (" + xuid + ")";
     }
 
     public static void sendToServer(GeyserSession session, BedrockPacketHandler originalPacketHandler, Server server) {
