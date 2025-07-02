@@ -112,9 +112,24 @@ public class GeyserConnect implements Extension {
         // If we are using floodgate then disable the extension.
         // GeyserConnect also doesn't support the connection sequence that occurs when the default RemoteServer
         // auth-type is offline (and there is no reason to change it when GeyserConnect is in use).
-        if (geyserInstance.getConfig().getRemote().authType() != AuthType.ONLINE) {
-            this.logger().error("auth-type is not set to 'online' in the Geyser config, this will break GeyserConnect. Disabling!");
-            this.disable();
+        // Updated check to support bedrock-auth-mode
+        AuthType geyserAuthType = geyserInstance.getConfig().getRemote().authType();
+        String bedrockAuthMode = config.bedrockAuthMode().toLowerCase();
+
+        if ("offline".equals(bedrockAuthMode)) {
+            if (geyserAuthType != AuthType.OFFLINE) {
+                this.logger().error("bedrock-auth-mode is 'offline' but Geyser auth-type is not 'offline'. This is required. Disabling GeyserConnect!");
+                this.disable();
+                return; // Stop further initialization
+            }
+            this.logger().info("GeyserConnect is running in bedrock-auth-mode: offline. Geyser auth-type is correctly set to 'offline'.");
+        } else { // Default to "online" behavior
+            if (geyserAuthType != AuthType.ONLINE) {
+                this.logger().error("bedrock-auth-mode is 'online' but Geyser auth-type is not 'online'. This is required. Disabling GeyserConnect!");
+                this.disable();
+                return; // Stop further initialization
+            }
+            this.logger().info("GeyserConnect is running in bedrock-auth-mode: online. Geyser auth-type is correctly set to 'online'.");
         }
     }
 

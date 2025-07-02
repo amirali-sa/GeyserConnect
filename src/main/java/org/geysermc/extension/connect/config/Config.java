@@ -35,5 +35,14 @@ public record Config(
     @JsonProperty("hard-player-limit") boolean hardPlayerLimit,
     List<Server> servers,
     @JsonProperty("custom-servers") CustomServersSection customServers,
-    VirtualHostSection vhost) {
+    VirtualHostSection vhost,
+    @JsonProperty("bedrock-auth-mode") String bedrockAuthMode) {
+
+    public String bedrockAuthMode() {
+        // Return "online" if null or empty, for backward compatibility or if not specified
+        if (bedrockAuthMode == null || bedrockAuthMode.isEmpty()) {
+            return "online";
+        }
+        return bedrockAuthMode;
+    }
 }

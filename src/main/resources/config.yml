@@ -6,6 +6,11 @@
 # This is loaded live so will update without a server restart
 welcome-file: welcome.txt
 
+# Authentication mode for Bedrock players. Can be 'online' or 'offline'.
+# If 'offline', players can join without an Xbox account. Geyser's auth-type must also be 'offline'.
+# If 'online', normal Xbox authentication is enforced. Geyser's auth-type must also be 'online'.
+bedrock-auth-mode: online
+
 # Enabled hard max player limit
 # This will kick players if the server is full
 hard-player-limit: false
