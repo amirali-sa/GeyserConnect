@@ -80,7 +80,7 @@ public class PacketHandler extends UpstreamPacketHandler {
         geyserConnect.logger().debug("Player initialized: " + Utils.displayName(session));
 
         // Check if the player is an offline Bedrock player and if they are allowed
-        if (session.authType() == AuthType.OFFLINE) {
+        if (session.getAuthData() != null && session.getAuthData().authType() == AuthType.OFFLINE) {
             if (!geyserConnect.config().allowOfflineBedrockPlayers()) {
                 geyserConnect.logger().info("Disconnecting offline Bedrock player " + Utils.displayName(session) + " as allow-offline-bedrock-players is false.");
                 session.disconnect("Offline Bedrock players are not permitted by this server."); // TODO: Make this translatable?

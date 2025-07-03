@@ -1,6 +1,7 @@
 package org.geysermc.extension.connect;
 
 import org.cloudburstmc.protocol.bedrock.packet.BedrockPacketHandler;
+import org.geysermc.geyser.auth.AuthData; // Import for AuthData
 import org.cloudburstmc.protocol.bedrock.packet.SetLocalPlayerAsInitializedPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import org.geysermc.extension.connect.config.Config;
@@ -66,8 +67,10 @@ class OfflineBedrockPlayerTest {
     @Test
     void whenOfflinePlayerAllowed_AndPlayerIsOffline_ThenProceeds() {
         // Arrange
+        AuthData mockAuthData = mock(AuthData.class);
+        when(mockAuthData.authType()).thenReturn(AuthType.OFFLINE);
+        when(session.getAuthData()).thenReturn(mockAuthData);
         when(config.allowOfflineBedrockPlayers()).thenReturn(true);
-        when(session.authType()).thenReturn(AuthType.OFFLINE);
 
         SetLocalPlayerAsInitializedPacket packet = new SetLocalPlayerAsInitializedPacket();
         packet.setRuntimeEntityId(1L); // Example value
@@ -88,8 +91,10 @@ class OfflineBedrockPlayerTest {
     @Test
     void whenOfflinePlayerNotAllowed_AndPlayerIsOffline_ThenDisconnects() {
         // Arrange
+        AuthData mockAuthData = mock(AuthData.class);
+        when(mockAuthData.authType()).thenReturn(AuthType.OFFLINE);
+        when(session.getAuthData()).thenReturn(mockAuthData);
         when(config.allowOfflineBedrockPlayers()).thenReturn(false);
-        when(session.authType()).thenReturn(AuthType.OFFLINE);
         // Mock session.disconnect to prevent NPE if it tries to use other unmocked parts
         doNothing().when(session).disconnect(anyString());
 
@@ -109,8 +114,10 @@ class OfflineBedrockPlayerTest {
     @Test
     void whenOfflinePlayerNotAllowed_AndPlayerIsOnline_ThenProceeds() {
         // Arrange
+        AuthData mockAuthData = mock(AuthData.class);
+        when(mockAuthData.authType()).thenReturn(AuthType.ONLINE);
+        when(session.getAuthData()).thenReturn(mockAuthData);
         when(config.allowOfflineBedrockPlayers()).thenReturn(false); // This config should not affect online players
-        when(session.authType()).thenReturn(AuthType.ONLINE);
 
         SetLocalPlayerAsInitializedPacket packet = new SetLocalPlayerAsInitializedPacket();
         packet.setRuntimeEntityId(1L);
@@ -126,8 +133,10 @@ class OfflineBedrockPlayerTest {
     @Test
     void whenOfflinePlayerAllowed_AndPlayerIsOnline_ThenProceeds() {
         // Arrange
+        AuthData mockAuthData = mock(AuthData.class);
+        when(mockAuthData.authType()).thenReturn(AuthType.ONLINE);
+        when(session.getAuthData()).thenReturn(mockAuthData);
         when(config.allowOfflineBedrockPlayers()).thenReturn(true); // This config should not affect online players
-        when(session.authType()).thenReturn(AuthType.ONLINE);
 
         SetLocalPlayerAsInitializedPacket packet = new SetLocalPlayerAsInitializedPacket();
         packet.setRuntimeEntityId(1L);
