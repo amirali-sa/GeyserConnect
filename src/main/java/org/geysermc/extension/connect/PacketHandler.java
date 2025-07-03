@@ -38,6 +38,7 @@ import org.geysermc.extension.connect.ui.UIHandler;
 import org.geysermc.extension.connect.utils.Server;
 import org.geysermc.extension.connect.utils.ServerManager;
 import org.geysermc.extension.connect.utils.Utils;
+import org.geysermc.geyser.api.network.AuthType; // Correctly placed import
 import org.geysermc.geyser.entity.attribute.GeyserAttributeType;
 import org.geysermc.geyser.network.UpstreamPacketHandler;
 import org.geysermc.geyser.session.GeyserSession;
@@ -77,6 +78,17 @@ public class PacketHandler extends UpstreamPacketHandler {
     @Override
     public PacketSignal handle(SetLocalPlayerAsInitializedPacket packet) {
         geyserConnect.logger().debug("Player initialized: " + Utils.displayName(session));
+
+        // Check if the player is an offline Bedrock player and if they are allowed
+        if (session.authType() == AuthType.OFFLINE) {
+            if (!geyserConnect.config().allowOfflineBedrockPlayers()) {
+                geyserConnect.logger().info("Disconnecting offline Bedrock player " + Utils.displayName(session) + " as allow-offline-bedrock-players is false.");
+                session.disconnect("Offline Bedrock players are not permitted by this server."); // TODO: Make this translatable?
+                return PacketSignal.HANDLED;
+            } else {
+                geyserConnect.logger().debug("Allowing offline Bedrock player " + Utils.displayName(session) + " as allow-offline-bedrock-players is true.");
+            }
+        }
 
         // Handle the virtual host if specified
         VirtualHostSection vhost = geyserConnect.config().vhost();
@@ -163,4 +175,3 @@ public class PacketHandler extends UpstreamPacketHandler {
         return originalPacketHandler.handle(packet); // relies on state in the original handler
     }
 }
-

@@ -33,6 +33,7 @@ import java.util.List;
 public record Config(
     @JsonProperty("welcome-file") String welcomeFile,
     @JsonProperty("hard-player-limit") boolean hardPlayerLimit,
+    @JsonProperty("allow-offline-bedrock-players") boolean allowOfflineBedrockPlayers,
     List<Server> servers,
     @JsonProperty("custom-servers") CustomServersSection customServers,
     VirtualHostSection vhost) {

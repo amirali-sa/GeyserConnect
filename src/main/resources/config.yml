@@ -10,6 +10,12 @@ welcome-file: welcome.txt
 # This will kick players if the server is full
 hard-player-limit: false
 
+# Allow Bedrock players that Geyser identifies as 'offline' (e.g., not logged into Xbox Live)
+# to connect through GeyserConnect.
+# This relies on Geyser itself being configured to permit such players first.
+# If false, GeyserConnect will deny connections from Bedrock clients that Geyser considers offline.
+allow-offline-bedrock-players: false
+
 # A global list of servers sent to all clients
 servers:
   - name: The Hive
