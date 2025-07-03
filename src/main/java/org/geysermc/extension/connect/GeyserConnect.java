@@ -121,6 +121,37 @@ public class GeyserConnect implements Extension {
     @Subscribe
     public void onSessionInitialize(SessionInitializeEvent event) {
         GeyserSession session = (GeyserSession) event.connection();
+
+        // GeyserConnect specific config access
+        org.geysermc.extension.connect.config.Config geyserConnectConfig = GeyserConnect.instance().config();
+
+        if (session.getAuthData() == null && geyserConnectConfig.allowOfflineBedrockPlayers()) {
+            // It's crucial to get the correct username.
+            // session.getClientData().getDisplayName() is a common way.
+            // session.bedrockUsername() is another possibility.
+            // We'll prefer getDisplayName() if available, otherwise bedrockUsername().
+            String username = session.getClientData().getDisplayName();
+            if (username == null || username.isEmpty()) {
+                username = session.bedrockUsername();
+            }
+
+            if (username != null && !username.isEmpty()) {
+                java.util.UUID uuid = java.util.UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                // Assuming AuthData constructor: AuthData(name, uuid, xuid, authType)
+                // For offline mode, XUID is typically null or an empty string.
+                // The AuthType will be OFFLINE.
+                // The existing session.authenticate(username) call mentioned by user might not be needed
+                // if setAuthData handles the necessary authentication steps.
+                // We will proceed without an explicit authenticate call for now, as setAuthData should suffice.
+                session.setAuthData(new org.geysermc.geyser.api.network.AuthData(username, uuid, null, org.geysermc.geyser.api.network.AuthType.OFFLINE));
+
+                // Log the action
+                this.logger().info("Set offline AuthData for player: " + username + " with UUID: " + uuid);
+            } else {
+                this.logger().warning("Could not determine username for offline AuthData generation.");
+            }
+        }
+
         if (config().hardPlayerLimit()) {
             if (session.getGeyser().getSessionManager().size() >= session.getGeyser().getConfig().getMaxPlayers()) {
                 session.disconnect("disconnectionScreen.serverFull");
